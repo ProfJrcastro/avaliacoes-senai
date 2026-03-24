@@ -1,40 +1,50 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title>Iniciar Avaliação</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Avaliação - Instituição</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        :root { --azul-senai: #0054a6; --vermelho-senai: #ff0000; --cinza: #f4f4f4; }
+        body { font-family: 'Arial', sans-serif; margin: 0; background-color: var(--cinza); }
+        header { background: var(--azul-senai); color: white; padding: 20px; text-align: center; border-bottom: 5px solid var(--vermelho-senai); }
+        .container { max-width: 800px; margin: 20px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .hidden { display: none; }
+        input, select, button { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background: var(--azul-senai); color: white; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; }
+        button:hover { background: #003d7a; }
+        .questao { margin-bottom: 25px; padding: 15px; border-left: 5px solid var(--azul-senai); background: #f9f9f9; }
+        #timer { color: var(--vermelho-senai); font-weight: bold; text-align: right; }
+    </style>
 </head>
-
 <body>
 
-<header>AVALIAÇÃO SENAI</header>
+<header>
+    <h1>PORTAL DE AVALIAÇÕES</h1>
+</header>
 
-<div class="container">
-  <h2>Identificação</h2>
-
-  <input type="text" id="nome" placeholder="Nome completo">
-  <input type="text" id="matricula" placeholder="Matrícula">
-
-  <button onclick="iniciar()">Iniciar Prova</button>
+<div class="container" id="login-area">
+    <h2>Identificação do Aluno</h2>
+    <input type="text" id="nome" placeholder="Nome Completo" required>
+    <input type="text" id="matricula" placeholder="Número da Matrícula" required>
+    <select id="select-uc">
+        <option value="">Selecione a Unidade Curricular</option>
+        <option value="Logística">Logística</option>
+        <option value="Mecânica">Mecânica</option>
+        <option value="Informática">Informática</option>
+    </select>
+    <button onclick="iniciarProva()">INICIAR AVALIAÇÃO</button>
 </div>
 
-<script>
-function iniciar(){
-  const nome = document.getElementById("nome").value;
-  const matricula = document.getElementById("matricula").value;
+<div class="container hidden" id="prova-area">
+    <div id="timer">Atenção: Não saia desta aba!</div>
+    <h3 id="info-aluno"></h3>
+    <hr>
+    <div id="questoes-container"></div>
+    <button onclick="finalizarProva()">FINALIZAR E ENVIAR RESPOSTAS</button>
+</div>
 
-  if(!nome || !matricula){
-    alert("Preencha todos os campos!");
-    return;
-  }
-
-  localStorage.setItem("nome", nome);
-  localStorage.setItem("matricula", matricula);
-
-  window.location.href = "prova.html";
-}
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
