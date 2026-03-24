@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Iniciar Avaliação</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>AVALIAÇÃO SENAI</header>
+
+<div class="container">
+  <h2>Identificação</h2>
+
+  <input type="text" id="nome" placeholder="Nome completo">
+  <input type="text" id="matricula" placeholder="Matrícula">
+
+  <button onclick="iniciar()">Iniciar Prova</button>
+</div>
+
+<script>
+function iniciar(){
+  const nome = document.getElementById("nome").value;
+  const matricula = document.getElementById("matricula").value;
+
+  if(!nome || !matricula){
+    alert("Preencha todos os campos!");
+    return;
+  }
+
+  localStorage.setItem("nome", nome);
+  localStorage.setItem("matricula", matricula);
+
+  window.location.href = "prova.html";
+}
+</script>
+
+</body>
+</html>

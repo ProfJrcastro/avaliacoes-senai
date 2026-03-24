@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Prova</title>
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script src="banco.js"></script>
+</head>
+
+<body>
+
+<header>PROVA EM ANDAMENTO</header>
+
+<div class="container" id="prova"></div>
+
+<button onclick="finalizar()">Finalizar</button>
+
+<script>
+
+// BLOQUEIOS
+window.onbeforeunload = () => "Não saia da prova!";
+
+document.documentElement.requestFullscreen();
+
+document.addEventListener("fullscreenchange", () => {
+  if (!document.fullscreenElement) {
+    alert("Você saiu da prova! Reiniciando...");
+    location.reload();
+  }
+});
+
+// RENDER QUESTÕES
+const div = document.getElementById("prova");
+
+sistema.prova.questoes.forEach((q, i) => {
+  div.innerHTML += `<p>${i+1}) ${q.pergunta}</p>`;
+
+  for(let letra in q.alternativas){
+    div.innerHTML += `
+      <label>
+        <input type="radio" name="q${i}" value="${letra}">
+        ${letra}) ${q.alternativas[letra]}
+      </label><br>
+    `;
+  }
+});
+
+// FINALIZAR
+function finalizar(){
+
+  let respostas = [];
+
+  sistema.prova.questoes.forEach((q,i)=>{
+    let marcada = document.querySelector(`input[name="q${i}"]:checked`);
+    respostas.push(marcada ? marcada.value : "N");
+  });
+
+  // EmailJS
+  emailjs.init("SEU_USER_ID");
+
+  emailjs.send("SEU_SERVICE_ID","SEU_TEMPLATE_ID",{
+    nome: localStorage.getItem("nome"),
+    matricula: localStorage.getItem("matricula"),
+    respostas: respostas.join(", "),
+    prova: sistema.prova.titulo,
+    para: sistema.professorEmail
+  });
+
+  alert("Avaliação enviada com sucesso!");
+
+  localStorage.clear();
+  window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>

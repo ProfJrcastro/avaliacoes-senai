@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Painel Professor</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>Painel Administrativo</header>
+
+<div class="container">
+
+<h2>Gerar Questão</h2>
+
+<input id="pergunta" placeholder="Pergunta">
+<input id="A" placeholder="Alternativa A">
+<input id="B" placeholder="Alternativa B">
+<input id="C" placeholder="Alternativa C">
+<input id="D" placeholder="Alternativa D">
+<input id="E" placeholder="Alternativa E">
+
+<select id="correta">
+  <option>A</option>
+  <option>B</option>
+  <option>C</option>
+  <option>D</option>
+  <option>E</option>
+</select>
+
+<button onclick="gerar()">Gerar Código</button>
+
+<pre id="saida"></pre>
+
+</div>
+
+<script>
+function gerar(){
+  const p = pergunta.value;
+
+  const codigo = `
+{
+  pergunta: "${p}",
+  alternativas: {
+    A: "${A.value}",
+    B: "${B.value}",
+    C: "${C.value}",
+    D: "${D.value}",
+    E: "${E.value}"
+  },
+  correta: "${correta.value}"
+},
+`;
+
+  document.getElementById("saida").innerText = codigo;
+}
+</script>
+
+</body>
+</html>
