@@ -1,61 +1,64 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title>Painel Professor</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Painel Administrativo - Professor</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #e9ecef; }
+        .box { background: white; padding: 20px; border-radius: 8px; max-width: 600px; margin: auto; }
+        textarea { width: 100%; height: 60px; }
+        .q-box { border: 1px solid #ddd; padding: 10px; margin-top: 10px; }
+    </style>
 </head>
-
 <body>
+    <div class="box">
+        <h2>Configurações do Professor</h2>
+        <input type="email" id="email-prof" placeholder="E-mail para receber as notas">
+        <button onclick="salvarConfig()">Salvar E-mail</button>
+        
+        <hr>
+        <h3>Cadastrar Questão</h3>
+        <textarea id="pergunta" placeholder="Enunciado da questão"></textarea>
+        <input type="text" id="optA" placeholder="Opção A">
+        <input type="text" id="optB" placeholder="Opção B">
+        <input type="text" id="optC" placeholder="Opção C">
+        <input type="text" id="optD" placeholder="Opção D">
+        <input type="text" id="optE" placeholder="Opção E">
+        <select id="correta">
+            <option value="A">Correta: A</option>
+            <option value="B">Correta: B</option>
+            <option value="C">Correta: C</option>
+            <option value="D">Correta: D</option>
+            <option value="E">Correta: E</option>
+        </select>
+        <button onclick="adicionarQuestao()">Adicionar Questão</button>
+        <div id="lista-questoes"></div>
+    </div>
 
-<header>Painel Administrativo</header>
+    <script>
+        function salvarConfig() {
+            localStorage.setItem('emailProfessor', document.getElementById('email-prof').value);
+            alert("E-mail salvo com sucesso!");
+        }
 
-<div class="container">
-
-<h2>Gerar Questão</h2>
-
-<input id="pergunta" placeholder="Pergunta">
-<input id="A" placeholder="Alternativa A">
-<input id="B" placeholder="Alternativa B">
-<input id="C" placeholder="Alternativa C">
-<input id="D" placeholder="Alternativa D">
-<input id="E" placeholder="Alternativa E">
-
-<select id="correta">
-  <option>A</option>
-  <option>B</option>
-  <option>C</option>
-  <option>D</option>
-  <option>E</option>
-</select>
-
-<button onclick="gerar()">Gerar Código</button>
-
-<pre id="saida"></pre>
-
-</div>
-
-<script>
-function gerar(){
-  const p = pergunta.value;
-
-  const codigo = `
-{
-  pergunta: "${p}",
-  alternativas: {
-    A: "${A.value}",
-    B: "${B.value}",
-    C: "${C.value}",
-    D: "${D.value}",
-    E: "${E.value}"
-  },
-  correta: "${correta.value}"
-},
-`;
-
-  document.getElementById("saida").innerText = codigo;
-}
-</script>
-
+        function adicionarQuestao() {
+            let questoes = JSON.parse(localStorage.getItem('questoes') || "[]");
+            const nova = {
+                pergunta: document.getElementById('pergunta').value,
+                opcoes: [
+                    document.getElementById('optA').value,
+                    document.getElementById('optB').value,
+                    document.getElementById('optC').value,
+                    document.getElementById('optD').value,
+                    document.getElementById('optE').value
+                ],
+                correta: document.getElementById('correta').value
+            };
+            questoes.push(nova);
+            localStorage.setItem('questoes', JSON.stringify(questoes));
+            alert("Questão adicionada!");
+            location.reload();
+        }
+    </script>
 </body>
 </html>
