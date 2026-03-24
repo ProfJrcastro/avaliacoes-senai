@@ -2,63 +2,110 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Painel Administrativo - Professor</title>
+    <title>Painel Administrativo | SENAI</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #e9ecef; }
-        .box { background: white; padding: 20px; border-radius: 8px; max-width: 600px; margin: auto; }
-        textarea { width: 100%; height: 60px; }
-        .q-box { border: 1px solid #ddd; padding: 10px; margin-top: 10px; }
+        :root { --azul: #0054a6; --vermelho: #ed1c24; --cinza: #f4f4f4; --bg: #e9ecef; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 0; }
+        header { background: var(--azul); color: white; padding: 15px 5%; border-bottom: 5px solid var(--vermelho); display: flex; justify-content: space-between; align-items: center; }
+        .container { max-width: 900px; margin: 30px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { color: var(--azul); border-bottom: 2px solid var(--cinza); padding-bottom: 10px; }
+        label { display: block; margin-top: 15px; font-weight: bold; color: #444; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
+        .grid-opcoes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .btn { background: var(--azul); color: white; border: none; padding: 15px 25px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 20px; transition: 0.3s; }
+        .btn:hover { background: #003d7a; }
+        .btn-copy { background: #28a745; margin-top: 10px; width: 100%; }
+        #json-output { background: #222; color: #0f0; padding: 15px; border-radius: 4px; font-family: monospace; overflow-x: auto; margin-top: 20px; display: none; }
+        .card-questao { background: var(--cinza); padding: 15px; margin-top: 10px; border-radius: 4px; border-left: 5px solid var(--azul); }
     </style>
 </head>
 <body>
-    <div class="box">
-        <h2>Configurações do Professor</h2>
-        <input type="email" id="email-prof" placeholder="E-mail para receber as notas">
-        <button onclick="salvarConfig()">Salvar E-mail</button>
-        
-        <hr>
-        <h3>Cadastrar Questão</h3>
-        <textarea id="pergunta" placeholder="Enunciado da questão"></textarea>
-        <input type="text" id="optA" placeholder="Opção A">
-        <input type="text" id="optB" placeholder="Opção B">
-        <input type="text" id="optC" placeholder="Opção C">
-        <input type="text" id="optD" placeholder="Opção D">
-        <input type="text" id="optE" placeholder="Opção E">
-        <select id="correta">
-            <option value="A">Correta: A</option>
-            <option value="B">Correta: B</option>
-            <option value="C">Correta: C</option>
-            <option value="D">Correta: D</option>
-            <option value="E">Correta: E</option>
-        </select>
-        <button onclick="adicionarQuestao()">Adicionar Questão</button>
-        <div id="lista-questoes"></div>
+
+<header>
+    <div style="font-size: 24px; font-weight: bold;">SENAI <span style="font-weight: 100;">ADMIN</span></div>
+    <a href="index.html" style="color: white; text-decoration: none;">Sair</a>
+</header>
+
+<div class="container">
+    <h2>Configurar Avaliação</h2>
+    
+    <label>E-mail do Professor (Para receber resultados):</label>
+    <input type="email" id="emailProf" placeholder="exemplo@firjan.com.br">
+
+    <hr style="margin: 30px 0;">
+
+    <h2>Adicionar Questão</h2>
+    <label>Enunciado da Questão:</label>
+    <textarea id="pergunta" placeholder="Digite a pergunta aqui..."></textarea>
+
+    <div class="grid-opcoes">
+        <div><label>Opção A:</label><input type="text" id="optA"></div>
+        <div><label>Opção B:</label><input type="text" id="optB"></div>
+        <div><label>Opção C:</label><input type="text" id="optC"></div>
+        <div><label>Opção D:</label><input type="text" id="optD"></div>
+        <div><label>Opção E:</label><input type="text" id="optE"></div>
+        <div>
+            <label>Resposta Correta:</label>
+            <select id="correta">
+                <option value="A">A</option><option value="B">B</option>
+                <option value="C">C</option><option value="D">D</option>
+                <option value="E">E</option>
+            </select>
+        </div>
     </div>
 
-    <script>
-        function salvarConfig() {
-            localStorage.setItem('emailProfessor', document.getElementById('email-prof').value);
-            alert("E-mail salvo com sucesso!");
-        }
+    <button class="btn" onclick="addQuestao()">+ ADICIONAR À LISTA</button>
 
-        function adicionarQuestao() {
-            let questoes = JSON.parse(localStorage.getItem('questoes') || "[]");
-            const nova = {
-                pergunta: document.getElementById('pergunta').value,
-                opcoes: [
-                    document.getElementById('optA').value,
-                    document.getElementById('optB').value,
-                    document.getElementById('optC').value,
-                    document.getElementById('optD').value,
-                    document.getElementById('optE').value
-                ],
-                correta: document.getElementById('correta').value
-            };
-            questoes.push(nova);
-            localStorage.setItem('questoes', JSON.stringify(questoes));
-            alert("Questão adicionada!");
-            location.reload();
-        }
-    </script>
+    <div id="lista-preview"></div>
+
+    <hr style="margin: 30px 0;">
+    <h2>Finalizar e Salvar no Código</h2>
+    <p style="font-size: 14px; color: #666;">Clique no botão abaixo para gerar o código que deve ser colado no arquivo <strong>questoes.js</strong> do seu GitHub.</p>
+    <button class="btn btn-copy" onclick="gerarCodigo()">GERAR CÓDIGO FINAL</button>
+    
+    <pre id="json-output"></pre>
+</div>
+
+<script>
+    let listaQuestoes = [];
+
+    function addQuestao() {
+        const q = {
+            pergunta: document.getElementById('pergunta').value,
+            opcoes: [
+                document.getElementById('optA').value,
+                document.getElementById('optB').value,
+                document.getElementById('optC').value,
+                document.getElementById('optD').value,
+                document.getElementById('optE').value
+            ],
+            correta: document.getElementById('correta').value
+        };
+        listaQuestoes.push(q);
+        renderLista();
+        // Limpar campos
+        document.getElementById('pergunta').value = "";
+    }
+
+    function renderLista() {
+        const div = document.getElementById('lista-preview');
+        div.innerHTML = "<h3>Questões Prontas: " + listaQuestoes.length + "</h3>";
+        listaQuestoes.forEach((item, i) => {
+            div.innerHTML += `<div class="card-questao"><strong>${i+1}.</strong> ${item.pergunta} (Correta: ${item.correta})</div>`;
+        });
+    }
+
+    function gerarCodigo() {
+        const email = document.getElementById('emailProf').value;
+        const output = {
+            emailProfessor: email,
+            questoes: listaQuestoes
+        };
+        const campoTexto = document.getElementById('json-output');
+        campoTexto.style.display = "block";
+        campoTexto.innerText = "const DADOS_PROVA = " + JSON.stringify(output, null, 2) + ";";
+        alert("Código gerado! Copie o texto verde abaixo.");
+    }
+</script>
 </body>
 </html>
