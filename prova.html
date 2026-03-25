@@ -1,79 +1,139 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<script src="banco.js"></script>
-<meta charset="UTF-8">
-<title>Prova</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avaliação Oficial - SENAI RJ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="banco.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-<script src="banco.js"></script>
+    <style>
+        :root { --azul: #0054a6; --vermelho: #ed1c24; --fundo: #f4f4f4; }
+        body { font-family: 'Roboto', sans-serif; background: var(--fundo); margin: 0; user-select: none; }
+        
+        header { 
+            background: var(--azul); color: white; padding: 15px 5%; 
+            border-bottom: 5px solid var(--vermelho); display: flex; 
+            justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 1000;
+        }
+
+        .container { max-width: 800px; margin: 30px auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        
+        .questao-box { margin-bottom: 30px; padding: 20px; border-left: 5px solid var(--azul); background: #fdfdfd; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .questao-enunciado { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 15px; }
+        
+        .opcao-item { display: block; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; transition: 0.2s; }
+        .opcao-item:hover { background: #f0f7ff; border-color: var(--azul); }
+        input[type="radio"] { margin-right: 10px; transform: scale(1.2); cursor: pointer; }
+
+        .btn-finalizar { 
+            background: #28a745; color: white; border: none; padding: 20px; 
+            width: 100%; font-size: 18px; font-weight: bold; border-radius: 6px; 
+            cursor: pointer; transition: 0.3s;
+        }
+        .btn-finalizar:hover { background: #218838; transform: translateY(-2px); }
+    </style>
 </head>
+<body onload="iniciarSistema()">
 
-<body>
+<header>
+    <div id="info-aluno"><strong>SENAI RJ</strong> | Carregando...</div>
+    <div style="font-size: 12px; background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 4px;">MODO SEGURO ATIVO</div>
+</header>
 
-<header>PROVA EM ANDAMENTO</header>
-
-<div class="container" id="prova"></div>
-
-<button onclick="finalizar()">Finalizar</button>
+<div class="container">
+    <div id="prova-area"></div>
+    <button class="btn-finalizar" onclick="finalizar()">FINALIZAR E ENVIAR RESPOSTAS</button>
+</div>
 
 <script>
+    // Configurações Iniciais
+    function iniciarSistema() {
+        const nome = localStorage.getItem("nome");
+        const matricula = localStorage.getItem("matricula");
+        
+        if (!nome) {
+            alert("Identificação necessária!");
+            window.location.href = "index.html";
+            return;
+        }
 
-// BLOQUEIOS
-window.onbeforeunload = () => "Não saia da prova!";
+        document.getElementById('info-aluno').innerHTML = `<strong>ALUNO:</strong> ${nome} (${matricula})`;
+        
+        // Entrar em Fullscreen
+        document.documentElement.requestFullscreen().catch(() => {});
 
-document.documentElement.requestFullscreen();
+        renderizarQuestoes();
+    }
 
-document.addEventListener("fullscreenchange", () => {
-  if (!document.fullscreenElement) {
-    alert("Você saiu da prova! Reiniciando...");
-    location.reload();
-  }
-});
+    function renderizarQuestoes() {
+        const area = document.getElementById("prova-area");
+        
+        if (typeof BANCO_DADOS === 'undefined' || BANCO_DADOS.questoes.length === 0) {
+            area.innerHTML = "<p style='color:red'>Erro: Nenhuma questão encontrada no banco.js!</p>";
+            return;
+        }
 
-// RENDER QUESTÕES
-const div = document.getElementById("prova");
+        BANCO_DADOS.questoes.forEach((q, i) => {
+            let htmlOpcoes = q.opcoes.map((opcao, index) => {
+                let letra = String.fromCharCode(65 + index); // A, B, C...
+                return `
+                    <label class="opcao-item">
+                        <input type="radio" name="q${i}" value="${letra}" required>
+                        <strong>${letra})</strong> ${opcao}
+                    </label>
+                `;
+            }).join('');
 
-sistema.prova.questoes.forEach((q, i) => {
-  div.innerHTML += `<p>${i+1}) ${q.pergunta}</p>`;
+            area.innerHTML += `
+                <div class="questao-box">
+                    <div class="questao-enunciado">${i+1}. ${q.pergunta}</div>
+                    ${htmlOpcoes}
+                </div>
+            `;
+        });
+    }
 
-  for(let letra in q.alternativas){
-    div.innerHTML += `
-      <label>
-        <input type="radio" name="q${i}" value="${letra}">
-        ${letra}) ${q.alternativas[letra]}
-      </label><br>
-    `;
-  }
-});
+    // BLOQUEIOS ANTI-COLA
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+            alert("AVISO: Você saiu da aba da prova! Isso será registrado.");
+        }
+    });
 
-// FINALIZAR
-function finalizar(){
+    // FINALIZAR E ENVIAR
+    function finalizar() {
+        if (!confirm("Deseja realmente finalizar a prova?")) return;
 
-  let respostas = [];
+        let respostasAluno = [];
+        BANCO_DADOS.questoes.forEach((q, i) => {
+            let marcada = document.querySelector(`input[name="q${i}"]:checked`);
+            respostasAluno.push(`Questão ${i+1}: ${marcada ? marcada.value : "Em branco"}`);
+        });
 
-  sistema.prova.questoes.forEach((q,i)=>{
-    let marcada = document.querySelector(`input[name="q${i}"]:checked`);
-    respostas.push(marcada ? marcada.value : "N");
-  });
+        // Envio via EmailJS
+        emailjs.init("SEU_USER_ID"); // Substitua pelo seu ID real
 
-  // EmailJS
-  emailjs.init("SEU_USER_ID");
+        const dadosEmail = {
+            nome: localStorage.getItem("nome"),
+            matricula: localStorage.getItem("matricula"),
+            respostas: respostasAluno.join("\n"),
+            email_professor: BANCO_DADOS.config.email
+        };
 
-  emailjs.send("SEU_SERVICE_ID","SEU_TEMPLATE_ID",{
-    nome: localStorage.getItem("nome"),
-    matricula: localStorage.getItem("matricula"),
-    respostas: respostas.join(", "),
-    prova: sistema.prova.titulo,
-    para: sistema.professorEmail
-  });
-
-  alert("Avaliação enviada com sucesso!");
-
-  localStorage.clear();
-  window.location.href = "index.html";
-}
+        emailjs.send("SEU_SERVICE_ID", "SEU_TEMPLATE_ID", dadosEmail)
+            .then(() => {
+                alert("Avaliação enviada com sucesso ao professor!");
+                localStorage.clear();
+                window.location.href = "index.html";
+            })
+            .catch(err => {
+                alert("Erro ao enviar e-mail. Verifique sua conexão.");
+                console.error(err);
+            });
+    }
 </script>
 
 </body>
