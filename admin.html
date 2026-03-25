@@ -2,74 +2,203 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Painel Administrativo | SENAI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo | SENAI RJ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --azul: #0054a6; --vermelho: #ed1c24; --cinza: #f4f4f4; --bg: #e9ecef; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 0; }
-        header { background: var(--azul); color: white; padding: 15px 5%; border-bottom: 5px solid var(--vermelho); display: flex; justify-content: space-between; align-items: center; }
-        .container { max-width: 900px; margin: 30px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { color: var(--azul); border-bottom: 2px solid var(--cinza); padding-bottom: 10px; }
-        label { display: block; margin-top: 15px; font-weight: bold; color: #444; }
-        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
-        .grid-opcoes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .btn { background: var(--azul); color: white; border: none; padding: 15px 25px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 20px; transition: 0.3s; }
-        .btn:hover { background: #003d7a; }
-        .btn-copy { background: #28a745; margin-top: 10px; width: 100%; }
-        #json-output { background: #222; color: #0f0; padding: 15px; border-radius: 4px; font-family: monospace; overflow-x: auto; margin-top: 20px; display: none; }
-        .card-questao { background: var(--cinza); padding: 15px; margin-top: 10px; border-radius: 4px; border-left: 5px solid var(--azul); }
+        :root {
+            --azul-senai: #0054a6;
+            --vermelho-senai: #ed1c24;
+            --cinza-claro: #f8f9fa;
+            --texto: #333;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #e9ecef;
+            margin: 0;
+            color: var(--texto);
+        }
+
+        header {
+            background: var(--azul-senai);
+            color: white;
+            padding: 20px 5%;
+            border-bottom: 6px solid var(--vermelho-senai);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: var(--azul-senai);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-left: 5px solid var(--vermelho-senai);
+            padding-left: 15px;
+            margin-bottom: 30px;
+        }
+
+        .section-box {
+            background: var(--cinza-claro);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 1px solid #dee2e6;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        input[type="text"], input[type="email"], textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--azul-senai);
+            box-shadow: 0 0 0 3px rgba(0,84,166,0.1);
+        }
+
+        .grid-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        button {
+            background: var(--azul-senai);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: #003d7a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-add {
+            background: #28a745;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn-add:hover { background: #218838; }
+
+        #lista-questoes {
+            margin-top: 30px;
+        }
+
+        .card-questao {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .codigo-gerado {
+            background: #212529;
+            color: #39FF14;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: auto;
+            margin-top: 20px;
+            display: none;
+        }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-size: 24px; font-weight: bold;">SENAI <span style="font-weight: 100;">ADMIN</span></div>
-    <a href="index.html" style="color: white; text-decoration: none;">Sair</a>
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+        <span style="font-size: 24px; font-weight: bold;">SISTEMA DE GESTÃO DE AVALIAÇÕES</span>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/SENAI_Logo.svg/1280px-SENAI_Logo.svg.png" alt="Logo SENAI" height="40" style="filter: brightness(0) invert(1);">
+    </div>
 </header>
 
 <div class="container">
-    <h2>Configurar Avaliação</h2>
-    
-    <label>E-mail do Professor (Para receber resultados):</label>
-    <input type="email" id="emailProf" placeholder="exemplo@firjan.com.br">
-
-    <hr style="margin: 30px 0;">
-
-    <h2>Adicionar Questão</h2>
-    <label>Enunciado da Questão:</label>
-    <textarea id="pergunta" placeholder="Digite a pergunta aqui..."></textarea>
-
-    <div class="grid-opcoes">
-        <div><label>Opção A:</label><input type="text" id="optA"></div>
-        <div><label>Opção B:</label><input type="text" id="optB"></div>
-        <div><label>Opção C:</label><input type="text" id="optC"></div>
-        <div><label>Opção D:</label><input type="text" id="optD"></div>
-        <div><label>Opção E:</label><input type="text" id="optE"></div>
-        <div>
-            <label>Resposta Correta:</label>
-            <select id="correta">
-                <option value="A">A</option><option value="B">B</option>
-                <option value="C">C</option><option value="D">D</option>
-                <option value="E">E</option>
-            </select>
-        </div>
+    <h2>Configurações Gerais</h2>
+    <div class="section-box">
+        <label>E-mail do Professor (Recebimento de Notas)</label>
+        <input type="email" id="email-prof" placeholder="exemplo@firjan.com.br">
+        <button onclick="salvarConfig()">Salvar E-mail</button>
     </div>
 
-    <button class="btn" onclick="addQuestao()">+ ADICIONAR À LISTA</button>
+    <h2>Cadastrar Nova Questão</h2>
+    <div class="section-box">
+        <label>Enunciado da Questão</label>
+        <textarea id="pergunta" rows="4" placeholder="Digite o texto da questão..."></textarea>
 
-    <div id="lista-preview"></div>
+        <div class="grid-options">
+            <div><label>Opção A</label><input type="text" id="optA" placeholder="Resposta A"></div>
+            <div><label>Opção B</label><input type="text" id="optB" placeholder="Resposta B"></div>
+            <div><label>Opção C</label><input type="text" id="optC" placeholder="Resposta C"></div>
+            <div><label>Opção D</label><input type="text" id="optD" placeholder="Resposta D"></div>
+            <div><label>Opção E</label><input type="text" id="optE" placeholder="Resposta E"></div>
+            <div>
+                <label>Resposta Correta</label>
+                <select id="correta">
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                    <option value="E">E</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-add" onclick="adicionarQuestao()">+ Adicionar Questão à Avaliação</button>
+    </div>
 
-    <hr style="margin: 30px 0;">
-    <h2>Finalizar e Salvar no Código</h2>
-    <p style="font-size: 14px; color: #666;">Clique no botão abaixo para gerar o código que deve ser colado no arquivo <strong>questoes.js</strong> do seu GitHub.</p>
-    <button class="btn btn-copy" onclick="gerarCodigo()">GERAR CÓDIGO FINAL</button>
-    
-    <pre id="json-output"></pre>
+    <h2>Questões na Prova</h2>
+    <div id="lista-questoes">
+        </div>
+
+    <button style="background: #6c757d; width: 100%;" onclick="gerarCodigo()">Gerar Código para o GitHub</button>
+    <div id="json-output" class="codigo-gerado"></div>
 </div>
 
 <script>
-    let listaQuestoes = [];
+    let bancoQuestões = [];
 
-    function addQuestao() {
+    function salvarConfig() {
+        const email = document.getElementById('email-prof').value;
+        if(!email) return alert("Insira um e-mail válido!");
+        localStorage.setItem('emailProfessor', email);
+        alert("Configuração de e-mail salva!");
+    }
+
+    function adicionarQuestao() {
         const q = {
             pergunta: document.getElementById('pergunta').value,
             opcoes: [
@@ -81,31 +210,46 @@
             ],
             correta: document.getElementById('correta').value
         };
-        listaQuestoes.push(q);
-        renderLista();
-        // Limpar campos
+
+        if(!q.pergunta || !q.opcoes[0]) return alert("Preencha ao menos a pergunta e a opção A!");
+
+        bancoQuestões.push(q);
+        atualizarLista();
+        
+        // Limpa campos para a próxima
         document.getElementById('pergunta').value = "";
+        document.querySelectorAll('.grid-options input').forEach(i => i.value = "");
     }
 
-    function renderLista() {
-        const div = document.getElementById('lista-preview');
-        div.innerHTML = "<h3>Questões Prontas: " + listaQuestoes.length + "</h3>";
-        listaQuestoes.forEach((item, i) => {
-            div.innerHTML += `<div class="card-questao"><strong>${i+1}.</strong> ${item.pergunta} (Correta: ${item.correta})</div>`;
+    function atualizarLista() {
+        const lista = document.getElementById('lista-questoes');
+        lista.innerHTML = "";
+        bancoQuestões.forEach((item, index) => {
+            lista.innerHTML += `
+                <div class="card-questao">
+                    <span><strong>Questão ${index + 1}:</strong> ${item.pergunta.substring(0, 50)}...</span>
+                    <button style="padding: 5px 10px; background: #dc3545;" onclick="remover(${index})">Excluir</button>
+                </div>
+            `;
         });
     }
 
+    function remover(index) {
+        bancoQuestões.splice(index, 1);
+        atualizarLista();
+    }
+
     function gerarCodigo() {
-        const email = document.getElementById('emailProf').value;
-        const output = {
-            emailProfessor: email,
-            questoes: listaQuestoes
+        const email = localStorage.getItem('emailProfessor');
+        const final = {
+            config: { email: email },
+            questoes: bancoQuestões
         };
-        const campoTexto = document.getElementById('json-output');
-        campoTexto.style.display = "block";
-        campoTexto.innerText = "const DADOS_PROVA = " + JSON.stringify(output, null, 2) + ";";
-        alert("Código gerado! Copie o texto verde abaixo.");
+        const output = document.getElementById('json-output');
+        output.style.display = "block";
+        output.innerText = "const BANCO_DADOS = " + JSON.stringify(final, null, 2) + ";";
     }
 </script>
+
 </body>
 </html>
